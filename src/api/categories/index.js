@@ -46,7 +46,8 @@ categoriesRouter.get("/:productId/addCategory", async (req, res, next) => {
 categoriesRouter.post("/:productId/bulk", async (req, res, next) => {
   try {
     const categories = await CategoriesModel.bulkCreate([
-      { category: "Phone", category: "chair" },
+      { category: "Phone" },
+      { category: "Pens" },
     ]);
     res.send(categories.map((category) => category.categoryId));
   } catch (err) {
