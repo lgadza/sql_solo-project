@@ -1,6 +1,7 @@
 import express from "express";
 import createHttpError from "http-errors";
 import { Op } from "sequelize";
+import ReviewsModel from "../reviews/model.js";
 import ProductsModel from "./model.js";
 
 const productsRouter = express.Router();
@@ -96,6 +97,18 @@ productsRouter.delete("/:productId", async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+  }
+});
+productsRouter.get("/:productId/reviews", async (req, res, next) => {
+  try {
+    const product = await ProductsModel.findByPk(req.params.productId, {
+      include: { model: ReviewsModel, attributes: ["review"] },
+      // where:{name}
+    });
+    res.send(product);
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
 });
 
