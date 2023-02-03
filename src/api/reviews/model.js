@@ -1,10 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../../db.js";
-// import CategoriesModel from "../categories/model.js";
 import ProductsModel from "../products/model.js";
-// import ReviewsModel from "../reviews/model.js";
-// import ReviewsCategoriesModel from "./reviewsCategoriesModel.js.js";
-
 const ReviewsModel = sequelize.define("review", {
   reviewId: {
     type: DataTypes.UUID,
