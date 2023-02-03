@@ -11,6 +11,7 @@ import {
   notFoundErrorHandler,
   unauthorizedErrorHandler,
 } from "./errorHandlers.js";
+import categoriesRouter from "./api/categories/index.js";
 
 const server = express();
 const port = process.env.PORT || 3001;
@@ -22,6 +23,7 @@ server.use(express.json());
 // ********************************** ENDPOINTS ****************************************
 server.use("/products", productsRouter);
 server.use("/products", reviewsRouter);
+server.use("/products", categoriesRouter);
 
 // ******************************* ERROR HANDLERS **************************************
 server.use(badRequestErrorHandler);

@@ -103,7 +103,7 @@ productsRouter.get("/:productId/reviews", async (req, res, next) => {
   try {
     const product = await ProductsModel.findByPk(req.params.productId, {
       include: { model: ReviewsModel, attributes: ["review"] },
-      // where:{name}
+      // where: { review: { [Op.iLike]: "%good%" } },  //TODO NOT WORKING
     });
     res.send(product);
   } catch (err) {
