@@ -1,8 +1,6 @@
 import express from "express";
 import ProductsModel from "../products/model.js";
 import ReviewsModel from "./model.js";
-// import ReviewsCategoriesModel from "./reviewsCategoriesModel.js.js";
-// import CategoriesModel from "../categories/model.js";
 
 const reviewsRouter = express.Router();
 
@@ -29,15 +27,6 @@ reviewsRouter.get("/:productId/reviews", async (req, res, next) => {
   try {
     const reviews = await ReviewsModel.findAll({
       include: [{ model: ProductsModel, attributes: ["name", "price"] }],
-      include: [
-        // { model: ReviewsModel, attributes: ["review"] },
-        // {
-        //   model: CategoriesModel,
-        //   attributes: ["name"],
-        //   through: { attributes: [] },
-        // },
-        // to exclude from the result the junction table rows --> through: { attributes: [] }
-      ],
     });
     res.send(reviews);
   } catch (error) {
@@ -45,7 +34,7 @@ reviewsRouter.get("/:productId/reviews", async (req, res, next) => {
   }
 });
 
-reviewsRouter.put("/:reviewId/category", async (req, res, next) => {
+reviewsRouter.put("/:reviewId/categories", async (req, res, next) => {
   try {
     const { id } = await ReviewsCategoriesModel.create({
       reviewId: req.params.reviewId,
@@ -56,5 +45,27 @@ reviewsRouter.put("/:reviewId/category", async (req, res, next) => {
     next(error);
   }
 });
+productsRouter.delete(
+  "/:reviewId/category/:productId",
+  async (req, res, next) => {
+    try {
+      const numberOfDeletedRows = await ProductsModel.destroy({
+        where: { id: req.params.productId },
+      });
+      if (numberOfDeletedRows === 1) {
+        res.status(204).send();
+      } else {
+        next(
+          createHttpError(
+            404,
+            `Product with id ${req.params.productId} not found!`
+          )
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default reviewsRouter;
