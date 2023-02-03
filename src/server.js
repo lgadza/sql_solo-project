@@ -4,6 +4,7 @@ import listEndpoints from "express-list-endpoints";
 import { pgConnect, syncModels } from "./db.js";
 import productsRouter from "./api/products/index.js";
 import reviewsRouter from "./api/reviews/index.js";
+import usersRouter from "./api/users/index.js";
 import {
   badRequestErrorHandler,
   forbiddenErrorHandler,
@@ -24,6 +25,7 @@ server.use(express.json());
 server.use("/products", productsRouter);
 server.use("/products", reviewsRouter);
 server.use("/products", categoriesRouter);
+server.use("/users", usersRouter);
 
 // ******************************* ERROR HANDLERS **************************************
 server.use(badRequestErrorHandler);

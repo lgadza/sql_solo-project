@@ -3,12 +3,24 @@ import createHttpError from "http-errors";
 import { Op } from "sequelize";
 import ReviewsModel from "../reviews/model.js";
 import ProductsModel from "./model.js";
-
+import ProductsCategoriesModel from "./productCategory.js";
+import CartModel from "./cartModel.js";
+import ProductsCartModel from "./ProductsCartModel.js";
 const productsRouter = express.Router();
 
 productsRouter.post("/", async (req, res, next) => {
   try {
     const { id } = await ProductsModel.create(req.body);
+    if (req.body.categories) {
+      await ProductsCategoriesModel.bulkCreate(
+        req.body.categories.map((category) => {
+          return {
+            categoryId: category,
+            productId: id,
+          };
+        })
+      );
+    }
     res.status(201).send({ id });
   } catch (error) {
     next(error);
@@ -109,6 +121,52 @@ productsRouter.get("/:productId/reviews", async (req, res, next) => {
   } catch (err) {
     console.log(err);
     next(err);
+  }
+});
+
+productsRouter.post("/:productId/:userId/cart", async (req, res, next) => {
+  try {
+    const activeCart = await CartModel.findAll({
+      where: {
+        [Op.and]: [{ userId: req.params.userId }, { status: "active" }],
+      },
+    });
+    if (activeCart.length === 0) {
+      await CartModel.create({ userId: req.params.userId, status: "active" });
+    }
+    console.log("CART!!!!!", activeCart);
+    const productIsThere = await ProductsCartModel.findAll({
+      where: {
+        [Op.and]: [
+          { productId: req.params.productId },
+          { cartId: activeCart[0].dataValues.id },
+        ],
+      },
+    });
+    console.log("PRODUCT!!!!!", productIsThere);
+    if (productIsThere.length === 0) {
+      await ProductsCartModel.create({
+        ...req.body,
+        cartId: activeCart[0].dataValues.id,
+        productId: req.params.productId,
+      });
+    } else {
+      await ProductsCartModel.update(
+        { quantity: req.body.quantity + productIsThere[0].dataValues.quantity },
+        {
+          where: {
+            [Op.and]: [
+              { productId: req.params.productId },
+              { cartId: activeCart[0].dataValues.id },
+            ],
+          },
+          returning: true,
+        }
+      );
+    }
+    res.status(201).send();
+  } catch (error) {
+    next(error);
   }
 });
 

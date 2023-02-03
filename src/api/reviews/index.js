@@ -45,7 +45,7 @@ reviewsRouter.put("/:reviewId/categories", async (req, res, next) => {
     next(error);
   }
 });
-productsRouter.delete(
+reviewsRouter.delete(
   "/:reviewId/category/:productId",
   async (req, res, next) => {
     try {

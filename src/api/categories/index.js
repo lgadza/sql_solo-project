@@ -1,5 +1,6 @@
 import express from "express";
 import CategoriesModel from "./model.js";
+import ProductsModel from "../products/model.js";
 
 const categoriesRouter = express.Router();
 
@@ -23,19 +24,21 @@ categoriesRouter.post("/:productId/addCategory", async (req, res, next) => {
     next(err);
   }
 });
-categoriesRouter.get("/:productId/addCategory", async (req, res, next) => {
+categoriesRouter.get("/:productId/categories", async (req, res, next) => {
   try {
     const categories = await CategoriesModel.findAll({
       include: [{ model: ProductsModel, attributes: ["name", "price"] }],
-      include: [
-        // { model: CategoriesModel, attributes: ["review"] },
-        // {
-        //   model: CategoriesModel,
-        //   attributes: ["name"],
-        //   through: { attributes: [] },
-        // },
-        // to exclude from the result the junction table rows --> through: { attributes: [] }
-      ],
+    });
+    res.send(categories);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+categoriesRouter.get("/:productId/categories", async (req, res, next) => {
+  try {
+    const categories = await CategoriesModel.findAll({
+      include: [{ model: ProductsModel, attributes: ["name", "price"] }],
     });
     res.send(categories);
   } catch (err) {
